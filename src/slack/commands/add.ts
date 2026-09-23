@@ -3,6 +3,7 @@ import { type NotificationMode, subscriptions } from '@db/schema'
 import { listForges, tryGetForge } from '@forges/registry'
 import { trackRepository } from '@forges/track'
 import { type ParsedArgs, parseRepo } from './parse'
+import { formatVerifyError } from './verify-error'
 import type { CommandContext } from './index'
 
 const VALID_MODES: readonly NotificationMode[] = [
@@ -63,9 +64,10 @@ export async function handleAdd(
 
   try {
     await forge.verifyRepository(parsed.owner, parsed.name)
-  } catch {
+  } catch (err) {
+    console.error(`Verify failed for ${forgeName}/${repoArg}:`, err)
     await ctx.respond(
-      `Repository \`${parsed.owner}/${parsed.name}\` not found or not accessible on ${forgeName}.`,
+      formatVerifyError(err, forgeName, parsed.owner, parsed.name),
     )
     return
   }
