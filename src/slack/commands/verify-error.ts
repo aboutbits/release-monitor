@@ -1,6 +1,5 @@
 import { ForgeError } from '@forges/types'
 
-/** User-facing explanation for a failed `verifyRepository` call. */
 export function formatVerifyError(
   err: unknown,
   forgeName: string,

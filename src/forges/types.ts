@@ -25,7 +25,6 @@ export type PollResult = {
 
 export type ForgeErrorKind =
   | 'not-found'
-  /** The forge refused our token (expired, revoked, or blocked by an org policy). */
   | 'token-rejected'
   | 'rate-limited'
   | 'unknown'
@@ -34,7 +33,6 @@ export type ForgeErrorKind =
 export class ForgeError extends Error {
   readonly kind: ForgeErrorKind
   readonly status: number
-  /** Human-readable reason as reported by the forge, if any. */
   readonly forgeMessage: string | undefined
 
   constructor(

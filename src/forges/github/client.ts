@@ -22,8 +22,6 @@ function errorKind(res: Response): ForgeErrorKind {
     return 'rate-limited'
   }
 
-  // 401: expired or revoked token. 403: token blocked by an org policy, e.g.
-  // a maximum fine-grained PAT lifetime or SAML SSO enforcement.
   if (res.status === 401 || res.status === 403) {
     return 'token-rejected'
   }
