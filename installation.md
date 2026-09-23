@@ -28,6 +28,7 @@ You need to create a Slack app in your workspace:
 - Create a [fine-grained personal access token](https://github.com/settings/tokens?type=beta) (or a classic token with `repo` scope for private repos, `public_repo` for public-only).
 - Required permission: **Contents: Read** (for private repos). Public-only repos work with no permissions set, the token is still recommended to avoid rate limits.
 - Using a dedicated machine/bot account is recommended for organisations.
+- Organisations can cap the maximum lifetime of fine-grained tokens. Keep the token's lifetime within the limit of every organisation you subscribe to, otherwise GitHub rejects it for all of that organisation's repos (public ones included). `/releases add` shows GitHub's reason when this happens.
 
 ---
 

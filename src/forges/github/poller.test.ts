@@ -1,15 +1,15 @@
-/* eslint-disable import/order -- Bun's mock.module must be called before the mocked module is imported (hoisting requirement) */
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
-
-const githubFetchMock = mock()
-
-void mock.module('./client', () => ({
-  githubFetch: githubFetchMock,
-}))
-
+import { afterAll, beforeEach, describe, expect, spyOn, test } from 'bun:test'
+import * as client from './client'
 import { pollGithubReleases } from './poller'
 import type { GithubApiRelease } from './types'
-/* eslint-enable import/order */
+
+// spyOn instead of mock.module: module mocks leak into other test files
+// (client.test.ts needs the real githubFetch), spies can be restored.
+const githubFetchMock = spyOn(client, 'githubFetch')
+
+afterAll(() => {
+  githubFetchMock.mockRestore()
+})
 
 function apiRelease(
   overrides: Partial<GithubApiRelease> = {},
