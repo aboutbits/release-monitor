@@ -58,3 +58,8 @@ jobs:
       - uses: aboutbits/github-actions-base/github-create-release@v2
         with:
           tag-name: v${{ steps.version.outputs.version }}
+          release-description: |
+            ## Image
+
+            - `${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.version }}`
+          release-notes-generation: 'true'
