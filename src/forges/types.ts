@@ -30,14 +30,44 @@ export type PollResult = {
   maxKnownId: string | null
 }
 
+export type ForgeErrorKind =
+  | 'not-found'
+  | 'token-rejected'
+  | 'rate-limited'
+  | 'unknown'
+
+/** Thrown by forge implementations so callers can react without knowing the forge. */
+export class ForgeError extends Error {
+  readonly kind: ForgeErrorKind
+  readonly status: number
+  readonly forgeMessage: string | undefined
+  /** Forge-specific next step for the user, e.g. a link to the relevant settings page. */
+  readonly hint: string | undefined
+
+  constructor(
+    kind: ForgeErrorKind,
+    status: number,
+    message: string,
+    details: { forgeMessage?: string; hint?: string } = {},
+  ) {
+    super(message)
+    this.name = 'ForgeError'
+    this.kind = kind
+    this.status = status
+    this.forgeMessage = details.forgeMessage
+    this.hint = details.hint
+  }
+}
+
 /** Contract every forge implementation must satisfy. */
 export type Forge = {
   readonly name: string
+  readonly displayName: string
 
   /** Returns the canonical web URL for the given repository. */
   getRepositoryUrl(owner: string, repo: string): string
 
-  /** Throws if the repo doesn't exist or is inaccessible. */
+  /** Throws a `ForgeError` if the repo doesn't exist or is inaccessible. */
   verifyRepository(owner: string, repo: string): Promise<void>
 
   /** Returns the latest stable release, or null if none found. */
