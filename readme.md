@@ -57,5 +57,5 @@ The app ships as a Docker image. Migrations run automatically on startup.
 docker run -d \
   --env-file .env \
   --restart unless-stopped \
-  ghcr.io/aboutbits/aboutbits-release-monitor:latest
+  ghcr.io/aboutbits/release-monitor:latest
 ```

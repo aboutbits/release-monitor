@@ -60,7 +60,7 @@ docker run -d \
   --restart unless-stopped \
   --env-file .env \
   --name release-monitor-app \
-  yourdockerhubuser/release-monitor-app:latest
+  ghcr.io/aboutbits/release-monitor:latest
 ```
 
 Once running, invite the bot to a Slack channel with `/invite @Release Monitor` and use `/releases` to get started.
