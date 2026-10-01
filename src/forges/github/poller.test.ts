@@ -70,7 +70,7 @@ describe('pollGithubReleases - 304 not modified', () => {
     await pollGithubReleases('owner', 'repo', { pollToken: 'W/"abc"' })
 
     expect(githubFetchMock).toHaveBeenCalledWith(
-      '/repos/owner/repo/releases?per_page=10',
+      '/repos/owner/repo/releases?per_page=25',
       { 'If-None-Match': 'W/"abc"' },
     )
   })
@@ -81,7 +81,7 @@ describe('pollGithubReleases - 304 not modified', () => {
     await pollGithubReleases('owner', 'repo', {})
 
     expect(githubFetchMock).toHaveBeenCalledWith(
-      '/repos/owner/repo/releases?per_page=10',
+      '/repos/owner/repo/releases?per_page=25',
       {},
     )
   })

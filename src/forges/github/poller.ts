@@ -4,7 +4,7 @@ import { githubFetch } from './client'
 import type { GithubApiRelease } from './types'
 import type { ForgeRelease, PollResult } from '@forges/types'
 
-const RELEASES_PER_PAGE = 10
+const RELEASES_PER_PAGE = 25
 
 export async function pollGithubReleases(
   owner: string,
