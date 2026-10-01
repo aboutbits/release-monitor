@@ -30,6 +30,13 @@ See [installation.md](./installation.md) for a full setup guide.
 
 ## Development
 
+### Requirements
+
+- [Bun](https://bun.sh/docs/installation) (latest version, the same as the `oven/bun` Docker image).
+- A PostgreSQL database (v16+), for example with `docker compose up -d` (see [`compose.yaml`](./compose.yaml)).
+
+### Setup
+
 Dev dependencies are hosted on GitHub Packages. Create an `.npmrc` with a [GitHub PAT](https://github.com/settings/tokens) that has the `read:packages` scope:
 
 ```
