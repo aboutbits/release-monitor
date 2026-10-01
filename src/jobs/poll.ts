@@ -150,10 +150,13 @@ async function recheckKnownReleases(
   repoSubscriptions: Subscription[],
 ): Promise<void> {
   const label = `${repo.forge}/${repo.owner}/${repo.repo}`
-  const cutoff = new Date(Date.now() - SECURITY_RECHECK_HOURS * 60 * 60 * 1000)
-  const candidates = knownReleases.filter(
-    (r) => new Date(r.publishedAt) > cutoff,
-  )
+  const cutoff = Temporal.Now.instant().subtract({
+    hours: SECURITY_RECHECK_HOURS,
+  })
+  const candidates = knownReleases.filter((r) => {
+    const publishedAt = Temporal.Instant.from(r.publishedAt)
+    return Temporal.Instant.compare(publishedAt, cutoff) > 0
+  })
   if (candidates.length === 0) {
     return
   }

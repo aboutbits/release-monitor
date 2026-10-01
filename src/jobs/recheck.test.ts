@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { checkSecurityRelease } from '@classify/security'
 import { isRecheckDue } from './recheck'
 
-const cutoff = new Date('2026-09-28T00:00:00Z')
+const cutoff = Temporal.Instant.from('2026-09-28T00:00:00Z')
 
 function stored(overrides: Partial<Parameters<typeof isRecheckDue>[0]> = {}) {
   return {

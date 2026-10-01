@@ -13,9 +13,10 @@ import type { ForgeRelease } from '@forges/types'
 export function isRecheckDue(
   stored: Pick<Release, 'publishedAt' | 'updatedAt' | 'isSecurity'>,
   forgeRelease: Pick<ForgeRelease, 'updatedAt'>,
-  cutoff: Date,
+  cutoff: Temporal.Instant,
 ): boolean {
-  if (stored.isSecurity || stored.publishedAt <= cutoff) {
+  const publishedAt = stored.publishedAt.toTemporalInstant()
+  if (stored.isSecurity || Temporal.Instant.compare(publishedAt, cutoff) <= 0) {
     return false
   }
 
@@ -23,7 +24,7 @@ export function isRecheckDue(
     return true
   }
 
-  return (
-    new Date(forgeRelease.updatedAt).getTime() !== stored.updatedAt.getTime()
+  return !Temporal.Instant.from(forgeRelease.updatedAt).equals(
+    stored.updatedAt.toTemporalInstant(),
   )
 }

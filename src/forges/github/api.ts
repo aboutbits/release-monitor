@@ -20,9 +20,11 @@ export function toForgeRelease(r: GithubApiRelease): ForgeRelease {
 export function sortByPublishedAt(
   releases: GithubApiRelease[],
 ): GithubApiRelease[] {
-  return [...releases].sort(
-    (a, b) =>
-      new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+  return [...releases].sort((a, b) =>
+    Temporal.Instant.compare(
+      Temporal.Instant.from(b.published_at),
+      Temporal.Instant.from(a.published_at),
+    ),
   )
 }
 
