@@ -24,9 +24,6 @@
     "prettier": "^3.8.3",
     "typescript": "~6.0.3"
   },
-  "peerDependencies": {
-    "typescript": "^6"
-  },
   "dependencies": {
     "@slack/bolt": "^4.7.2",
     "drizzle-orm": "^0.45.2"
