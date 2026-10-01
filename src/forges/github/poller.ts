@@ -1,5 +1,5 @@
 import { classifyRelease } from '@classify/stable'
-import { sortByPublishedAt, toForgeRelease } from './api'
+import { publishedNewestFirst, toForgeRelease } from './api'
 import { githubFetch } from './client'
 import type { GithubApiRelease } from './types'
 import type { ForgeRelease, PollResult } from '@forges/types'
@@ -43,7 +43,7 @@ export async function pollGithubReleases(
   const lastKnownBigInt = opts.lastKnownId ? BigInt(opts.lastKnownId) : null
   let maxSeenBigInt = lastKnownBigInt ?? 0n
 
-  for (const r of sortByPublishedAt(data)) {
+  for (const r of publishedNewestFirst(data)) {
     const id = BigInt(r.id)
     const isKnown = lastKnownBigInt !== null && id <= lastKnownBigInt
 

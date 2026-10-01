@@ -11,7 +11,8 @@
     "db:generate": "bun --bun drizzle-kit generate",
     "db:migrate": "bun --bun drizzle-kit migrate",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit"
   },
   "prettier": "@aboutbits/prettier-config",
   "devDependencies": {

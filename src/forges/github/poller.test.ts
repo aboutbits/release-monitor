@@ -282,20 +282,20 @@ describe('pollGithubReleases - release notes edited after publish', () => {
 })
 
 describe('pollGithubReleases - filtering', () => {
-  test('filters prerelease and draft, but they still count toward maxKnownId', async () => {
+  test('filters prerelease and draft, only the prerelease counts toward maxKnownId', async () => {
     githubFetchMock.mockResolvedValueOnce(
       jsonResponse([
+        apiRelease({
+          id: 11,
+          tag_name: 'v2.0.0',
+          draft: true,
+          published_at: null,
+        }),
         apiRelease({
           id: 10,
           tag_name: 'v2.0.0-rc1',
           prerelease: true,
           published_at: '2024-03-01T00:00:00Z',
-        }),
-        apiRelease({
-          id: 9,
-          tag_name: 'v1.5.0',
-          draft: true,
-          published_at: '2024-02-15T00:00:00Z',
         }),
         apiRelease({
           id: 8,
@@ -315,7 +315,12 @@ describe('pollGithubReleases - filtering', () => {
     githubFetchMock.mockResolvedValueOnce(
       jsonResponse([
         apiRelease({ id: 10, tag_name: 'v2.0.0-rc1', prerelease: true }),
-        apiRelease({ id: 9, tag_name: 'v1.5.0', draft: true }),
+        apiRelease({
+          id: 9,
+          tag_name: 'v1.5.0',
+          draft: true,
+          published_at: null,
+        }),
         apiRelease({ id: 8, tag_name: 'v1.4.0' }),
       ]),
     )
@@ -325,5 +330,44 @@ describe('pollGithubReleases - filtering', () => {
     })
 
     expect(result.knownReleases.map((r) => r.tagName)).toEqual(['v1.4.0'])
+  })
+
+  test('a draft is ignored, and it is new when it is published later', async () => {
+    // GitHub returns drafts with published_at: null to tokens with write
+    // access. A draft keeps its ID when it is published.
+    githubFetchMock.mockResolvedValueOnce(
+      jsonResponse([
+        apiRelease({
+          id: 50,
+          tag_name: 'v2.0.0',
+          draft: true,
+          published_at: null,
+        }),
+        apiRelease({ id: 40, tag_name: 'v1.9.0' }),
+      ]),
+    )
+
+    const first = await pollGithubReleases('owner', 'repo', {})
+
+    expect(first.releases.map((r) => r.tagName)).toEqual(['v1.9.0'])
+    expect(first.maxKnownId).toBe('40')
+
+    githubFetchMock.mockResolvedValueOnce(
+      jsonResponse([
+        apiRelease({
+          id: 50,
+          tag_name: 'v2.0.0',
+          published_at: '2024-06-01T00:00:00Z',
+        }),
+        apiRelease({ id: 40, tag_name: 'v1.9.0' }),
+      ]),
+    )
+
+    const second = await pollGithubReleases('owner', 'repo', {
+      lastKnownId: first.maxKnownId ?? undefined,
+    })
+
+    expect(second.releases.map((r) => r.tagName)).toEqual(['v2.0.0'])
+    expect(second.maxKnownId).toBe('50')
   })
 })
