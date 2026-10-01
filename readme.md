@@ -52,6 +52,14 @@ bun run db:generate  # generate migrations after schema changes
 bun run db:migrate   # apply migrations manually
 ```
 
+The tests of the poll job (`src/jobs/poll.test.ts`) need a PostgreSQL database and run only when `TEST_DATABASE_URL` is set. They delete all data in that database, so they refuse to run when the database name does not contain `test`:
+
+```bash
+docker compose up -d
+docker compose exec db createdb -U root release_monitor_test
+TEST_DATABASE_URL=postgres://root:password@localhost:5432/release_monitor_test bun test
+```
+
 Migrations are also applied automatically on startup, so `db:migrate` is only needed when running outside of the app (e.g. to inspect the schema before starting).
 
 All tables live in the `main` PostgreSQL schema (hardcoded in [`src/db/schema.ts`](./src/db/schema.ts) and [`drizzle.config.ts`](./drizzle.config.ts)). The `public` schema is intentionally avoided: it is on every role's default search_path and has historically been a namespace-pollution and privilege-escalation vector. To use a different schema, change the string in both files and regenerate the migrations with `bun run db:generate`.
