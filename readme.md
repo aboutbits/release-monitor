@@ -48,6 +48,7 @@ Dev dependencies are hosted on GitHub Packages. Create an `.npmrc` with a [GitHu
 bun install
 bun run dev          # hot reload
 bun test             # run tests
+bun run typecheck    # type-check with tsc (Bun does not type-check)
 bun run db:generate  # generate migrations after schema changes
 bun run db:migrate   # apply migrations manually
 ```
