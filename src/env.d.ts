@@ -13,6 +13,7 @@ declare module 'bun' {
     // Jobs
     POLL_CRON?: string
     DIGEST_CRON?: string
+    CRON_TZ?: string
     SECURITY_RECHECK_HOURS?: string
   }
 }
