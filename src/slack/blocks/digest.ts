@@ -1,3 +1,4 @@
+import { CRON_TZ } from '@jobs/schedule'
 import type { Release, Repository } from '@db/schema'
 import type { KnownBlock, RichTextBlock, RichTextSection } from '@slack/types'
 
@@ -5,10 +6,12 @@ const headerDateFmt = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
   month: 'long',
   day: 'numeric',
+  timeZone: CRON_TZ,
 })
 const releaseDateFmt = new Intl.DateTimeFormat('en-GB', {
   month: 'short',
   day: 'numeric',
+  timeZone: CRON_TZ,
 })
 
 export function buildDigestBlocks(

@@ -4,7 +4,7 @@ A Slack bot that monitors repositories for new releases and posts updates to you
 
 - **Periodic digest** - one message per channel per configured interval, grouped by repo
 - **Immediate notifications** - get notified right away for every new stable release
-- **Instant security alerts** - security releases are posted immediately to all subscribers regardless of their notification mode
+- **Instant security alerts** - security releases are posted immediately to all subscribers regardless of their notification mode, also when the security notes are added to a release after it was published
 - **Per-channel subscriptions** - each channel manages its own list independently
 
 ## Commands
@@ -30,6 +30,13 @@ See [installation.md](./installation.md) for a full setup guide.
 
 ## Development
 
+### Requirements
+
+- [Bun](https://bun.sh/docs/installation) 1.4.x, the same minor version as the `oven/bun:1.4-alpine` Docker image. The app needs 1.4 or later for the native `Temporal` API.
+- A PostgreSQL database (v16+), for example with `docker compose up -d` (see [`compose.yaml`](./compose.yaml)).
+
+### Setup
+
 Dev dependencies are hosted on GitHub Packages. Create an `.npmrc` with a [GitHub PAT](https://github.com/settings/tokens) that has the `read:packages` scope:
 
 ```
@@ -41,8 +48,17 @@ Dev dependencies are hosted on GitHub Packages. Create an `.npmrc` with a [GitHu
 bun install
 bun run dev          # hot reload
 bun test             # run tests
+bun run typecheck    # type-check with tsc (Bun does not type-check)
 bun run db:generate  # generate migrations after schema changes
 bun run db:migrate   # apply migrations manually
+```
+
+The tests of the poll job (`src/jobs/poll.test.ts`) need a PostgreSQL database and run only when `TEST_DATABASE_URL` is set. They delete all data in that database, so they refuse to run when the database name does not contain `test`:
+
+```bash
+docker compose up -d
+docker compose exec db createdb -U root release_monitor_test
+TEST_DATABASE_URL=postgres://root:password@localhost:5432/release_monitor_test bun test
 ```
 
 Migrations are also applied automatically on startup, so `db:migrate` is only needed when running outside of the app (e.g. to inspect the schema before starting).
@@ -57,5 +73,5 @@ The app ships as a Docker image. Migrations run automatically on startup.
 docker run -d \
   --env-file .env \
   --restart unless-stopped \
-  ghcr.io/aboutbits/aboutbits-release-monitor:latest
+  ghcr.io/aboutbits/release-monitor:latest
 ```

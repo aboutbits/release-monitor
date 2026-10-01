@@ -3,26 +3,39 @@ import { githubFetch } from './client'
 import type { GithubApiRelease } from './types'
 import type { ForgeRelease } from '@forges/types'
 
-export function toForgeRelease(r: GithubApiRelease): ForgeRelease {
+/** A release that is not a draft, so it has a publish time. */
+export type PublishedGithubRelease = GithubApiRelease & { published_at: string }
+
+export function toForgeRelease(r: PublishedGithubRelease): ForgeRelease {
   return {
     id: String(r.id),
     tagName: r.tag_name,
     name: r.name ?? null,
     url: r.html_url,
     publishedAt: r.published_at,
+    updatedAt: r.updated_at ?? null,
     body: r.body ?? '',
     isDraft: r.draft,
     isPrerelease: r.prerelease,
   }
 }
 
-export function sortByPublishedAt(
+/**
+ * Returns the published releases, newest first. Drafts are left out: they have
+ * no publish time, and a draft keeps its ID when it is published later, so it
+ * must not count as known before that.
+ */
+export function publishedNewestFirst(
   releases: GithubApiRelease[],
-): GithubApiRelease[] {
-  return [...releases].sort(
-    (a, b) =>
-      new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
-  )
+): PublishedGithubRelease[] {
+  return releases
+    .filter((r): r is PublishedGithubRelease => r.published_at !== null)
+    .sort((a, b) =>
+      Temporal.Instant.compare(
+        Temporal.Instant.from(b.published_at),
+        Temporal.Instant.from(a.published_at),
+      ),
+    )
 }
 
 export async function verifyRepository(
@@ -40,7 +53,7 @@ export async function fetchLatestStableRelease(
   const res = await githubFetch(`/repos/${owner}/${repo}/releases?per_page=10`)
   const data = (await res.json()) as GithubApiRelease[]
 
-  for (const r of sortByPublishedAt(data)) {
+  for (const r of publishedNewestFirst(data)) {
     const release = toForgeRelease(r)
     const { stable } = classifyRelease({
       tagName: release.tagName,

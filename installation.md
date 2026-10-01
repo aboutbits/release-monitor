@@ -45,8 +45,10 @@ DATABASE_URL=postgres://user:password@localhost/releases_db
 
 # Optional
 # POLL_CRON=0 * * * *        # How often to check releases (default: every hour)
-# DIGEST_CRON=30 7 * * *     # When to send the periodic digest in UTC (default: 07:30 UTC)
+# DIGEST_CRON=30 7 * * *     # When to send the periodic digest (default: 07:30 in CRON_TZ)
+# CRON_TZ=UTC                # IANA time zone for POLL_CRON, DIGEST_CRON, and the digest dates (default: UTC)
 # DATABASE_POOL_MAX=10       # Max connections in the DB connection pool (default: 10)
+# SECURITY_RECHECK_HOURS=72  # How long new releases are re-checked for security notes added after publish (default: 72)
 ```
 
 All tables are created in the `main` PostgreSQL schema. To use a different schema, change the hardcoded value in `src/db/schema.ts` and `drizzle.config.ts`, then regenerate and re-apply migrations.
@@ -60,7 +62,7 @@ docker run -d \
   --restart unless-stopped \
   --env-file .env \
   --name release-monitor-app \
-  yourdockerhubuser/release-monitor-app:latest
+  ghcr.io/aboutbits/release-monitor:latest
 ```
 
 Once running, invite the bot to a Slack channel with `/invite @Release Monitor` and use `/releases` to get started.

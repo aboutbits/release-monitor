@@ -70,6 +70,9 @@ export const releases = tableBuilder(
     publishedAt: timestamp('published_at', {
       withTimezone: true,
     }).notNull(),
+    // Last edit time reported by the forge, not the row update time. Do not
+    // add $onUpdate: the re-check compares this value with the forge value.
+    updatedAt: timestamp('updated_at', { withTimezone: true }),
     isSecurity: boolean('is_security').notNull().default(false),
     securityScore: integer('security_score'),
     securityReasons: jsonb('security_reasons'),
@@ -100,7 +103,7 @@ export const notifications = tableBuilder(
       .default(sql`now()`),
   },
   (t) => [
-    unique().on(t.releaseId, t.channelId),
+    unique().on(t.releaseId, t.channelId, t.kind),
     index('idx_notifications_channel_id').on(t.channelId),
   ],
 )

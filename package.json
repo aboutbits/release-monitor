@@ -11,20 +11,19 @@
     "db:generate": "bun --bun drizzle-kit generate",
     "db:migrate": "bun --bun drizzle-kit migrate",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit"
   },
   "prettier": "@aboutbits/prettier-config",
   "devDependencies": {
-    "@aboutbits/eslint-config": "^5.1.0",
+    "@aboutbits/eslint-config": "^6.1.0",
     "@aboutbits/prettier-config": "^2.0.2",
-    "@aboutbits/ts-config": "^1.1.16",
-    "@types/bun": "latest",
+    "@aboutbits/ts-config": "^1.2.1",
+    "@types/bun": "~1.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
-    "prettier": "^3.8.3"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
+    "prettier": "^3.8.3",
+    "typescript": "~6.0.3"
   },
   "dependencies": {
     "@slack/bolt": "^4.7.2",

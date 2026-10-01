@@ -3,4 +3,5 @@
 set -e
 set -o pipefail
 
+bun run typecheck
 bun run lint

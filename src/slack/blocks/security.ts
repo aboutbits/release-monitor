@@ -5,8 +5,9 @@ export function buildSecurityBlocks(
   repo: Repository,
   release: Release,
   reasons: string[],
+  note?: string,
 ): KnownBlock[] {
-  return [
+  const blocks: KnownBlock[] = [
     {
       type: 'header',
       text: {
@@ -40,4 +41,13 @@ export function buildSecurityBlocks(
       ],
     } satisfies RichTextBlock,
   ]
+
+  if (note) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: note }],
+    })
+  }
+
+  return blocks
 }

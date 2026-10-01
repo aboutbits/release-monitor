@@ -34,6 +34,8 @@ jobs:
         with:
           token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.x
       - uses: aboutbits/github-actions-base/git-setup@v2
       - name: Bump version in package.json
         id: version
