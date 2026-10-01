@@ -57,6 +57,7 @@ export async function trackRepository(
       name: latest.name,
       url: latest.url,
       publishedAt: new Date(latest.publishedAt),
+      updatedAt: latest.updatedAt ? new Date(latest.updatedAt) : null,
       isSecurity,
       securityScore: score,
       securityReasons: reasons,

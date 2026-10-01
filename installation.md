@@ -47,6 +47,7 @@ DATABASE_URL=postgres://user:password@localhost/releases_db
 # POLL_CRON=0 * * * *        # How often to check releases (default: every hour)
 # DIGEST_CRON=30 7 * * *     # When to send the periodic digest in UTC (default: 07:30 UTC)
 # DATABASE_POOL_MAX=10       # Max connections in the DB connection pool (default: 10)
+# SECURITY_RECHECK_HOURS=72  # How long new releases are re-checked for security notes added after publish (default: 72)
 ```
 
 All tables are created in the `main` PostgreSQL schema. To use a different schema, change the hardcoded value in `src/db/schema.ts` and `drizzle.config.ts`, then regenerate and re-apply migrations.

@@ -5,6 +5,8 @@ export type ForgeRelease = {
   name: string | null
   url: string
   publishedAt: string
+  /** Last edit time on the forge, or null if the forge does not provide one. */
+  updatedAt: string | null
   body: string
   isDraft: boolean
   isPrerelease: boolean
@@ -12,6 +14,11 @@ export type ForgeRelease = {
 
 export type PollResult = {
   releases: ForgeRelease[]
+  /**
+   * Stable releases at or below `lastKnownId` that are still on the fetched
+   * page. Used to re-classify releases whose notes were edited after publish.
+   */
+  knownReleases: ForgeRelease[]
   /** ETag, timestamp, or other forge-specific cache token for the next poll. */
   pollToken?: string
   notModified: boolean
@@ -39,7 +46,7 @@ export type Forge = {
     repo: string,
   ): Promise<ForgeRelease | null>
 
-  /** Returns new stable releases since lastKnownId, with an optional updated poll token. */
+  /** Returns new and already known stable releases, with an optional updated poll token. */
   pollReleases(
     owner: string,
     repo: string,

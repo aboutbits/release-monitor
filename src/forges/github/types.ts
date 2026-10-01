@@ -5,6 +5,7 @@ export type GithubApiRelease = {
   name: string | null
   html_url: string
   published_at: string
+  updated_at: string | null
   body: string | null
   draft: boolean
   prerelease: boolean

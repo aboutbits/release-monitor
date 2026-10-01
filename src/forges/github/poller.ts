@@ -24,6 +24,7 @@ export async function pollGithubReleases(
   if (response.status === 304) {
     return {
       releases: [],
+      knownReleases: [],
       pollToken: opts.pollToken,
       notModified: true,
       maxKnownId: opts.lastKnownId ?? null,
@@ -38,16 +39,15 @@ export async function pollGithubReleases(
 
   const data = (await response.json()) as GithubApiRelease[]
   const releases: ForgeRelease[] = []
+  const knownReleases: ForgeRelease[] = []
   const lastKnownBigInt = opts.lastKnownId ? BigInt(opts.lastKnownId) : null
   let maxSeenBigInt = lastKnownBigInt ?? 0n
 
   for (const r of sortByPublishedAt(data)) {
     const id = BigInt(r.id)
-    if (lastKnownBigInt !== null && id <= lastKnownBigInt) {
-      continue
-    }
+    const isKnown = lastKnownBigInt !== null && id <= lastKnownBigInt
 
-    if (id > maxSeenBigInt) {
+    if (!isKnown && id > maxSeenBigInt) {
       maxSeenBigInt = id
     }
 
@@ -60,11 +60,17 @@ export async function pollGithubReleases(
       isPrerelease: release.isPrerelease,
     })
 
-    if (stable) {
+    if (!stable) {
+      continue
+    }
+
+    if (isKnown) {
+      knownReleases.push(release)
+    } else {
       releases.push(release)
     }
   }
 
   const maxKnownId = maxSeenBigInt > 0n ? String(maxSeenBigInt) : null
-  return { releases, pollToken, notModified: false, maxKnownId }
+  return { releases, knownReleases, pollToken, notModified: false, maxKnownId }
 }

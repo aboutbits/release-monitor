@@ -10,6 +10,7 @@ export function toForgeRelease(r: GithubApiRelease): ForgeRelease {
     name: r.name ?? null,
     url: r.html_url,
     publishedAt: r.published_at,
+    updatedAt: r.updated_at ?? null,
     body: r.body ?? '',
     isDraft: r.draft,
     isPrerelease: r.prerelease,
