@@ -72,7 +72,16 @@ async function pollOne(repo: Repository): Promise<void> {
     .from(subscriptions)
     .where(eq(subscriptions.repositoryId, repo.id))
 
-  for (const forgeRelease of newReleases) {
+  // The forge returns the releases newest first. Post them oldest first, so
+  // that Slack shows them in the order they were published.
+  const oldestFirst = newReleases.toSorted((a, b) =>
+    Temporal.Instant.compare(
+      Temporal.Instant.from(a.publishedAt),
+      Temporal.Instant.from(b.publishedAt),
+    ),
+  )
+
+  for (const forgeRelease of oldestFirst) {
     const { isSecurity, score, reasons } = checkSecurityRelease({
       tagName: forgeRelease.tagName,
       name: forgeRelease.name,

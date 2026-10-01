@@ -182,6 +182,34 @@ describe.skipIf(!TEST_DATABASE_URL)('runPollJob (PostgreSQL)', () => {
     expect(updatedRepo?.pollToken).toBe('W/"etag"')
   })
 
+  test('several new releases are posted oldest first', async () => {
+    const repo = await insertRepository(null)
+    await subscribe(repo.id, 'C_IMMEDIATE', 'immediately')
+    // The poller returns the releases newest first.
+    pollWith({
+      releases: [
+        forgeRelease({
+          id: '101',
+          tagName: 'v1.2.1',
+          publishedAt: hoursAgo(1),
+        }),
+        forgeRelease({
+          id: '100',
+          tagName: 'v1.2.0',
+          publishedAt: hoursAgo(2),
+        }),
+      ],
+      maxKnownId: '101',
+    })
+
+    await runPollJob()
+
+    expect(sent.map((m) => m.text)).toEqual([
+      ':package: New release: owner/repo v1.2.0',
+      ':package: New release: owner/repo v1.2.1',
+    ])
+  })
+
   test('a new security release goes to every channel', async () => {
     const repo = await insertRepository(null)
     await subscribe(repo.id, 'C_DIGEST', 'digest')
