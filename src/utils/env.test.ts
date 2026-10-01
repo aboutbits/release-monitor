@@ -27,6 +27,13 @@ describe('timeZone', () => {
     expect(timeZone('CRON_TZ', 'UTC')).toBe('Europe/Rome')
   })
 
+  test('throws for a UTC offset, which Bun.cron does not accept', () => {
+    process.env.CRON_TZ = '+01:00'
+    expect(() => timeZone('CRON_TZ', 'UTC')).toThrow(
+      'CRON_TZ must be an IANA time zone, for example "Europe/Rome", got "+01:00"',
+    )
+  })
+
   test('throws for an invalid time zone', () => {
     process.env.CRON_TZ = 'Invalid/Zone'
     expect(() => timeZone('CRON_TZ', 'UTC')).toThrow(
