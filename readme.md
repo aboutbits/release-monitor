@@ -32,7 +32,7 @@ See [installation.md](./installation.md) for a full setup guide.
 
 ### Requirements
 
-- [Bun](https://bun.sh/docs/installation) 1.4 or later, because the app uses the native `Temporal` API. Use the latest version, the same as the `oven/bun` Docker image.
+- [Bun](https://bun.sh/docs/installation) 1.4.x, the same minor version as the `oven/bun:1.4-alpine` Docker image. The app needs 1.4 or later for the native `Temporal` API.
 - A PostgreSQL database (v16+), for example with `docker compose up -d` (see [`compose.yaml`](./compose.yaml)).
 
 ### Setup
