@@ -34,24 +34,28 @@ export class ForgeError extends Error {
   readonly kind: ForgeErrorKind
   readonly status: number
   readonly forgeMessage: string | undefined
+  /** Forge-specific next step for the user, e.g. a link to the relevant settings page. */
+  readonly hint: string | undefined
 
   constructor(
     kind: ForgeErrorKind,
     status: number,
     message: string,
-    forgeMessage?: string,
+    details: { forgeMessage?: string; hint?: string } = {},
   ) {
     super(message)
     this.name = 'ForgeError'
     this.kind = kind
     this.status = status
-    this.forgeMessage = forgeMessage
+    this.forgeMessage = details.forgeMessage
+    this.hint = details.hint
   }
 }
 
 /** Contract every forge implementation must satisfy. */
 export type Forge = {
   readonly name: string
+  readonly displayName: string
 
   /** Returns the canonical web URL for the given repository. */
   getRepositoryUrl(owner: string, repo: string): string

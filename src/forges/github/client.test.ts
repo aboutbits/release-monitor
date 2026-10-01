@@ -82,6 +82,28 @@ describe('githubFetch - token rejected', () => {
     })
   }
 
+  test('403 hints at the org token policy', async () => {
+    fetchSpy.mockResolvedValueOnce(errorResponse(403, LIFETIME_POLICY_MESSAGE))
+
+    const err = await catchForgeError(
+      githubFetch('/repos/aboutbits/release-monitor/releases?per_page=10'),
+    )
+
+    expect(err.hint).toContain(
+      'https://github.com/organizations/aboutbits/settings/personal-access-tokens',
+    )
+  })
+
+  test('401 has no org policy hint', async () => {
+    fetchSpy.mockResolvedValueOnce(errorResponse(401, 'Bad credentials'))
+
+    const err = await catchForgeError(
+      githubFetch('/repos/aboutbits/release-monitor'),
+    )
+
+    expect(err.hint).toBeUndefined()
+  })
+
   test('tolerates a non-JSON error body', async () => {
     fetchSpy.mockResolvedValueOnce(new Response('<html>', { status: 403 }))
 

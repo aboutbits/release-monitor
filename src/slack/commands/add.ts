@@ -67,7 +67,7 @@ export async function handleAdd(
   } catch (err) {
     console.error(`Verify failed for ${forgeName}/${repoArg}:`, err)
     await ctx.respond(
-      formatVerifyError(err, forgeName, parsed.owner, parsed.name),
+      formatVerifyError(err, forge.displayName, parsed.owner, parsed.name),
     )
     return
   }

@@ -39,6 +39,15 @@ async function readErrorMessage(res: Response): Promise<string | undefined> {
   }
 }
 
+function tokenPolicyHint(res: Response, path: string): string | undefined {
+  const owner = /^\/repos\/([^/]+)\//.exec(path)?.[1]
+  if (res.status !== 403 || isRateLimited(res) || !owner) {
+    return undefined
+  }
+
+  return `If \`${owner}\` is an organization, also check its personal access token policy: https://github.com/organizations/${owner}/settings/personal-access-tokens`
+}
+
 export async function githubFetch(
   path: string,
   extraHeaders: Record<string, string> = {},
@@ -56,6 +65,6 @@ export async function githubFetch(
     errorKind(res),
     res.status,
     `GitHub API error ${res.status} for ${path}${reason ? `: ${reason}` : ''}`,
-    reason,
+    { forgeMessage: reason, hint: tokenPolicyHint(res, path) },
   )
 }
