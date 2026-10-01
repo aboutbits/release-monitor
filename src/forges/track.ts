@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm'
 import { checkSecurityRelease } from '@classify/security'
 import { db } from '@db/client'
 import { type Repository, releases, repositories } from '@db/schema'
+import { toDate } from '@utils/date'
 import type { Forge } from './types'
 
 /** Registers a repository for tracking and stores a baseline release. Idempotent. */
@@ -57,7 +58,7 @@ export async function trackRepository(
       name: latest.name,
       url: latest.url,
       publishedAt: new Date(latest.publishedAt),
-      updatedAt: latest.updatedAt ? new Date(latest.updatedAt) : null,
+      updatedAt: toDate(latest.updatedAt),
       isSecurity,
       securityScore: score,
       securityReasons: reasons,

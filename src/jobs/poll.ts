@@ -15,6 +15,7 @@ import {
 } from '@db/schema'
 import { getForge } from '@forges/registry'
 import { isRecheckDue } from '@jobs/recheck'
+import { toDate } from '@utils/date'
 import { positiveInt } from '@utils/env'
 import type { ForgeRelease } from '@forges/types'
 
@@ -215,10 +216,6 @@ async function recheckKnownReleases(
       NOTES_EDITED_NOTE,
     )
   }
-}
-
-function toDate(value: string | null): Date | null {
-  return value ? new Date(value) : null
 }
 
 async function sendToChannels(
