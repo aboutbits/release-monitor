@@ -243,6 +243,39 @@ describe.skipIf(!TEST_DATABASE_URL)('runPollJob (PostgreSQL)', () => {
     expect(unchangedRepo?.lastCheckedAt).toBe(null)
   })
 
+  test('releases that become security releases are posted oldest first', async () => {
+    const repo = await insertRepository('100')
+    await subscribe(repo.id, 'C_DIGEST', 'digest')
+    // forge_release_id is text, so '100' sorts before '99'. Without an ORDER
+    // BY, the database returns the newer release first. Same case as
+    // keycloak 26.8.0 and 26.7.5.
+    const newer = forgeRelease({
+      id: '100',
+      tagName: '26.8.0',
+      publishedAt: hoursAgo(2),
+    })
+    const older = forgeRelease({
+      id: '99',
+      tagName: '26.7.5',
+      publishedAt: hoursAgo(3),
+    })
+    await insertStoredRelease(repo.id, newer)
+    await insertStoredRelease(repo.id, older)
+    const edited = (r: ForgeRelease) => ({
+      ...r,
+      body: CVE_BODY,
+      updatedAt: hoursAgo(1),
+    })
+    pollWith({ knownReleases: [edited(newer), edited(older)] })
+
+    await runPollJob()
+
+    expect(sent.map((m) => m.text)).toEqual([
+      ':lock: Security release: owner/repo 26.7.5',
+      ':lock: Security release: owner/repo 26.8.0',
+    ])
+  })
+
   test('notes edited after publish send the security alert once', async () => {
     const repo = await insertRepository('100')
     await subscribe(repo.id, 'C_DIGEST', 'digest')

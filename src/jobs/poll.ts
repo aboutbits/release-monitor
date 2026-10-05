@@ -1,4 +1,4 @@
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, asc, eq, inArray } from 'drizzle-orm'
 import { buildReleaseBlocks } from '@bot/blocks/release'
 import { buildSecurityBlocks } from '@bot/blocks/security'
 import { sendBlocks } from '@bot/send'
@@ -183,6 +183,8 @@ async function recheckKnownReleases(
         eq(releases.isSecurity, false),
       ),
     )
+    // Post the alerts in the order the releases were published.
+    .orderBy(asc(releases.publishedAt))
 
   for (const stored of storedReleases) {
     const forgeRelease = candidates.find((r) => r.id === stored.forgeReleaseId)
