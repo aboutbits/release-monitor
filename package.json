@@ -19,17 +19,17 @@
     "@aboutbits/eslint-config": "^6.1.0",
     "@aboutbits/prettier-config": "^2.0.2",
     "@aboutbits/ts-config": "^1.2.1",
-    "@types/bun": "~1.4.2",
-    "drizzle-kit": "^0.31.10",
-    "eslint": "^9",
-    "prettier": "^3.8.3",
+    "@types/bun": "~1.4.4",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9.39.5",
+    "prettier": "^3.9.10",
     "typescript": "~6.0.3"
   },
   "dependencies": {
-    "@slack/bolt": "^4.7.2",
-    "drizzle-orm": "^0.45.2"
+    "@slack/bolt": "^4.7.3",
+    "drizzle-orm": "^0.45.4"
   },
   "patchedDependencies": {
-    "drizzle-orm@0.45.2": "patches/drizzle-orm@0.45.2.patch"
+    "drizzle-orm@0.45.4": "patches/drizzle-orm@0.45.4.patch"
   }
 }
