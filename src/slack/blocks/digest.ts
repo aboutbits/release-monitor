@@ -69,18 +69,16 @@ export function buildDigestBlocks(
         {
           type: 'rich_text_list',
           style: 'bullet',
-          elements: sorted.map(
-            (r): RichTextSection => ({
-              type: 'rich_text_section',
-              elements: [
-                { type: 'link', url: r.url, text: r.tagName },
-                {
-                  type: 'text',
-                  text: `  |  ${releaseDateFmt.format(r.publishedAt)}`,
-                },
-              ],
-            }),
-          ),
+          elements: sorted.map((r): RichTextSection => ({
+            type: 'rich_text_section',
+            elements: [
+              { type: 'link', url: r.url, text: r.tagName },
+              {
+                type: 'text',
+                text: `  |  ${releaseDateFmt.format(r.publishedAt)}`,
+              },
+            ],
+          })),
         },
       ],
     }
