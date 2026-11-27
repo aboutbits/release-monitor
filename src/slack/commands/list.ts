@@ -1,7 +1,8 @@
 import { eq, sql } from 'drizzle-orm'
-import { buildListBlocks } from '@bot/blocks/list'
+import { buildListMessages } from '@bot/blocks/list'
 import { db } from '@db/client'
 import { repositories, subscriptions } from '@db/schema'
+import { sendListMessages } from './send-list'
 import type { CommandContext } from './index'
 import type { ParsedArgs } from './parse'
 
@@ -14,6 +15,7 @@ export async function handleList(
       forge: repositories.forge,
       owner: repositories.owner,
       repo: repositories.repo,
+      url: repositories.url,
       subscribedAt: subscriptions.subscribedAt,
       subscribedBy: subscriptions.subscribedBy,
       notificationMode: subscriptions.notificationMode,
@@ -33,5 +35,5 @@ export async function handleList(
     return
   }
 
-  await ctx.respond({ blocks: buildListBlocks(rows) })
+  await sendListMessages(buildListMessages(rows), rows.length, ctx)
 }
