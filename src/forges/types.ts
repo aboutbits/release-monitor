@@ -31,10 +31,7 @@ export type PollResult = {
 }
 
 export type ForgeErrorKind =
-  | 'not-found'
-  | 'token-rejected'
-  | 'rate-limited'
-  | 'unknown'
+  'not-found' | 'token-rejected' | 'rate-limited' | 'unknown'
 
 /** Thrown by forge implementations so callers can react without knowing the forge. */
 export class ForgeError extends Error {
