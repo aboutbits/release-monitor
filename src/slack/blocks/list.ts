@@ -16,12 +16,8 @@ const MODE_HEADINGS: Record<NotificationMode, string> = {
   'security-only': 'Security alerts only',
 }
 
-// The order of the groups in the list.
-const MODES: readonly NotificationMode[] = [
-  'immediately',
-  'digest',
-  'security-only',
-]
+// The order of the keys of MODE_HEADINGS is the order of the groups in the list.
+const MODES = Object.keys(MODE_HEADINGS) as NotificationMode[]
 
 const subscribedDateFmt = new Intl.DateTimeFormat('en-GB', {
   month: 'short',
@@ -39,14 +35,44 @@ export type SubscriptionRow = {
   notificationMode: string
 }
 
-function buildSummary(rows: SubscriptionRow[]): string {
+type Group = {
+  heading: string
+  rows: SubscriptionRow[]
+}
+
+function isKnownMode(mode: string): mode is NotificationMode {
+  return (MODES as readonly string[]).includes(mode)
+}
+
+// The column holds plain text, so a row can have a mode that no command writes. Such a row gets a last group
+// with its raw mode as the heading, so that the list shows every subscription that the summary counts.
+function groupByMode(rows: SubscriptionRow[]): Group[] {
+  const unknownModes = [
+    ...new Set(
+      rows.map((r) => r.notificationMode).filter((m) => !isKnownMode(m)),
+    ),
+  ].sort()
+  const headings = [
+    ...MODES.map((mode) => ({
+      mode,
+      heading: MODE_HEADINGS[mode],
+    })),
+    ...unknownModes.map((mode) => ({ mode, heading: mode })),
+  ]
+
+  return headings
+    .map(({ mode, heading }) => ({
+      heading,
+      rows: rows.filter((r) => r.notificationMode === mode),
+    }))
+    .filter((group) => group.rows.length > 0)
+}
+
+function buildSummary(rows: SubscriptionRow[], groups: Group[]): string {
   const repoWord = rows.length === 1 ? 'repo' : 'repos'
-  const counts = MODES.map((mode) => ({
-    mode,
-    count: rows.filter((r) => r.notificationMode === mode).length,
-  }))
-    .filter(({ count }) => count > 0)
-    .map(({ mode, count }) => `${count} ${MODE_HEADINGS[mode].toLowerCase()}`)
+  const counts = groups.map(
+    (group) => `${group.rows.length} ${group.heading.toLowerCase()}`,
+  )
 
   return [`${rows.length} ${repoWord}`, ...counts].join('  |  ')
 }
@@ -93,6 +119,7 @@ function buildGroup(
 export function buildListMessages(rows: SubscriptionRow[]): KnownBlock[][] {
   // The forge is shown only when the channel follows repositories on more than one forge.
   const showForge = new Set(rows.map((r) => r.forge)).size > 1
+  const groups = groupByMode(rows)
 
   let current: KnownBlock[] = [
     {
@@ -101,15 +128,15 @@ export function buildListMessages(rows: SubscriptionRow[]): KnownBlock[][] {
     },
     {
       type: 'context',
-      elements: [{ type: 'mrkdwn', text: buildSummary(rows) }],
+      elements: [{ type: 'mrkdwn', text: buildSummary(rows, groups) }],
     },
   ]
   let inCurrent = 0
   const messages = [current]
 
-  for (const mode of MODES) {
-    const groupRows = rows.filter((r) => r.notificationMode === mode)
-    let heading = MODE_HEADINGS[mode]
+  for (const group of groups) {
+    const groupRows = [...group.rows]
+    let heading = group.heading
 
     while (groupRows.length > 0) {
       if (
@@ -130,7 +157,7 @@ export function buildListMessages(rows: SubscriptionRow[]): KnownBlock[][] {
       }
       current.push(buildGroup(heading, part, showForge))
       inCurrent += part.length
-      heading = `${MODE_HEADINGS[mode]} (continued)`
+      heading = `${group.heading} (continued)`
     }
   }
 

@@ -195,4 +195,26 @@ describe('buildListMessages', () => {
       .reduce((sum, g) => sum + items(g).length, 0)
     expect(total).toBe(input.length)
   })
+
+  test('shows a subscription with an unknown mode in a last group and counts it', () => {
+    const blocks = at(
+      buildListMessages([row('a', 'digest'), row('b', 'weekly')]),
+      0,
+    )
+
+    expect(groups(blocks).map(heading)).toEqual(['Periodic digest', 'weekly'])
+    expect(firstElements(at(groups(blocks), 1))).toEqual([
+      {
+        type: 'link',
+        url: 'https://github.com/aboutbits/b',
+        text: 'aboutbits/b',
+      },
+    ])
+    expect(at(blocks, 1)).toEqual({
+      type: 'context',
+      elements: [
+        { type: 'mrkdwn', text: '2 repos  |  1 periodic digest  |  1 weekly' },
+      ],
+    })
+  })
 })
