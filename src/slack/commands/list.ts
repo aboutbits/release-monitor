@@ -1,7 +1,8 @@
 import { eq, sql } from 'drizzle-orm'
-import { MAX_MESSAGES_PER_COMMAND, buildListMessages } from '@bot/blocks/list'
+import { buildListMessages } from '@bot/blocks/list'
 import { db } from '@db/client'
 import { repositories, subscriptions } from '@db/schema'
+import { sendListMessages } from './send-list'
 import type { CommandContext } from './index'
 import type { ParsedArgs } from './parse'
 
@@ -34,18 +35,5 @@ export async function handleList(
     return
   }
 
-  const messages = buildListMessages(rows)
-  if (messages.length > MAX_MESSAGES_PER_COMMAND) {
-    console.error(
-      `List for channel ${ctx.channelId} needs ${messages.length} messages, Slack allows ${MAX_MESSAGES_PER_COMMAND}`,
-    )
-    await ctx.respond(
-      `This channel has ${rows.length} subscriptions. That is too many to list in Slack.`,
-    )
-    return
-  }
-
-  for (const blocks of messages) {
-    await ctx.respond({ text: 'Subscriptions in this channel', blocks })
-  }
+  await sendListMessages(buildListMessages(rows), rows.length, ctx)
 }
