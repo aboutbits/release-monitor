@@ -179,7 +179,7 @@ describe('buildListMessages', () => {
     expect(items(at(groups(second), 0))).toHaveLength(15)
   })
 
-  test('keeps every message at or below 50 blocks and loses no subscription', () => {
+  test('loses no subscription when a list spans several messages', () => {
     const input = [
       ...rows(700, 'digest'),
       ...rows(300, 'immediately'),
@@ -190,6 +190,19 @@ describe('buildListMessages', () => {
     for (const blocks of messages) {
       expect(blocks.length).toBeLessThanOrEqual(50)
     }
+    const total = messages
+      .flatMap(groups)
+      .reduce((sum, g) => sum + items(g).length, 0)
+    expect(total).toBe(input.length)
+  })
+
+  test('starts a new message before one would pass 50 blocks', () => {
+    const input = Array.from({ length: 30 }, (_, i) =>
+      row(`repo-${i}`, `mode-${i}`),
+    )
+    const messages = buildListMessages(input)
+
+    expect(messages.map((blocks) => blocks.length)).toEqual([50, 11])
     const total = messages
       .flatMap(groups)
       .reduce((sum, g) => sum + items(g).length, 0)
