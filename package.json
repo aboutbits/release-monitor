@@ -16,13 +16,13 @@
   },
   "prettier": "@aboutbits/prettier-config",
   "devDependencies": {
-    "@aboutbits/eslint-config": "^6.1.0",
+    "@aboutbits/eslint-config": "^6.2.0",
     "@aboutbits/prettier-config": "^2.0.2",
     "@aboutbits/ts-config": "^1.2.1",
-    "@types/bun": "~1.4.4",
+    "@types/bun": "~1.4.5",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9.39.5",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "typescript": "~6.0.3"
   },
   "dependencies": {
