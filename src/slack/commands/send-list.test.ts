@@ -1,4 +1,12 @@
-import { afterEach, describe, expect, spyOn, test } from 'bun:test'
+import {
+  type Mock,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  spyOn,
+  test,
+} from 'bun:test'
 import { sendListMessages } from './send-list'
 import type { RespondArguments } from '@slack/bolt'
 import type { KnownBlock } from '@slack/types'
@@ -23,13 +31,17 @@ function context() {
   }
 }
 
-const errorSpy = spyOn(console, 'error').mockImplementation(() => undefined)
-
-afterEach(() => {
-  errorSpy.mockClear()
-})
-
 describe('sendListMessages', () => {
+  let errorSpy: Mock<typeof console.error>
+
+  beforeEach(() => {
+    errorSpy = spyOn(console, 'error').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    errorSpy.mockRestore()
+  })
+
   test('sends one message as one reply', async () => {
     const { replies, ctx } = context()
 
